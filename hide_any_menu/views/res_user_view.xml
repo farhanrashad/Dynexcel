@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="view_users_hide_menu_form" model="ir.ui.view">
+            <field name="name">res.users.hide.menu.form</field>
+            <field name="model">res.users</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Hide Specific Menu">
+                        <separator string="Hide Specific Menu" colspan="4"/>
+                        <group colspan="4">
+                            <field name="menu_ids" nolabel="1"/>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+    </data>
+</odoo>
