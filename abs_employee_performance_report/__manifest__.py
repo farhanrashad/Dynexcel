@@ -2,7 +2,7 @@
 #################################################################################
 #
 #    Odoo, Open Source Management Solution
-#    Copyright (C) 2019-today Ascetic Business Solution <www.asceticbs.com>
+#    Copyright (C) 2018 Ascetic Business Solution <www.asceticbs.com>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -28,7 +28,7 @@
     'website': 'http://www.asceticbs.com',
     'description': """
 """,
-    'version': '12.0.0.1',
+    'version': '11.0.1.0.0',
     'depends': ['base','hr','project','hr_timesheet'],
     'data': ['security/ir.model.access.csv','views/employee_view.xml','report/employee_report.xml','report/employee_template_report.xml'],
     'images': ['static/description/banner.png'],
