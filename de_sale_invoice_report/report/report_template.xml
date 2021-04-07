@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+    
+    <template id="report_sale_invoice">
+        <t t-set="company" t-value="env.company"/>
+        <t t-call="web.html_container">
+        <t t-call="web.internal_layout">
+            <div class="page">
+                
+<i class="fa fa-phone"></i> +456423245 <br></br>
+<span class="fas fa-envelope"></span> abc@gmail.com
+
+                <br></br><br></br>  
+                 <table  class="table table-sm" style="background-color:#000066; color:#ffffff;">
+                        <tr>
+                           
+                            <td><div><strong>Invoice Date: </strong></div><div><t t-if="docs.invoice_date"><t t-esc="docs.invoice_date" /></t></div></td>
+                            <td><div><strong>Due Date: </strong></div><div><t t-esc="docs.invoice_date_due" /></div></td>
+                            <td><div><strong>Source: </strong></div><div><t t-esc="docs.invoice_origin" /></div></td>
+                            <td><div><strong>Invoice Month: </strong></div><div><t t-if="docs.invoice_date"><t t-esc="docs.invoice_date.strftime('%B %Y')"  /></t></div></td>
+                            <td><div><strong>Site/Location:A1: </strong></div><div><t t-esc="docs.sale_id.location" /></div></td>
+                            <td><div><strong>Payment Term: </strong></div><div><t t-esc="docs.invoice_payment_term_id.name" /></div></td>
+
+<!--                             <td><t t-esc="docs.invoice_date.strftime('%B %Y')" /></td>    -->
+<!--                             <span t-esc="time.strftime('%e %B %Y')" /> -->
+
+                        </tr>
+                </table>
+                <br></br><br></br>  
+                 <table id="tbl" class="table table-sm" border="1" style="height:200px;">
+                    <thead>
+                        <tr style="background-color:#3333ff; color:#ffffff; height:20px;">
+                            <th class="tbl_th">SR NO</th>
+                            <th class="tbl_th" style="text-align:center">DESCRIPTION</th>
+                            <th class="tbl_th" style="text-align:right">AMOUNT</th>
+                        </tr>
+                     </thead>
+                    <tbody>
+                        <t t-set="i" t-value="1"/>
+                        <t t-set="val" t-value="0"/>
+                        <t t-foreach='docs.sale_id.desc_ids' t-as='o'>
+                            <tr>
+                                <td class="tbl_th" style="text-align:center; "><span t-esc="i" /> </td>
+                                <td class="tbl_th" style="text-align:center; "><t t-esc="o.name" /></td> 
+                                <td class="tbl_th" style="text-align:right; "><strong><t t-esc="o.amount"/></strong></td>                       
+                                <t t-set="i" t-value="i+1"/>
+                            </tr>
+                            
+                        </t>
+<!--                     <tr>
+                            <td></td>
+                            <td></td>
+                            <td class="tbl_th" style="text-align:right"><strong><t t-esc="val" /></strong></td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                
+                <br></br><br></br>  
+                <div style="background-color:#000066; color:#ffffff;width:100%; text-align:right;">
+                    <strong>Total: </strong><t t-esc="docs.sale_id.total_amount" /> OMR
+                </div>
+         <style>
+             
+#tbl, .tbl_th {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+</style>
+<!--                 <div class="text-center">
+                    <h2>Sales Details</h2>
+                    <strong><t t-esc="date_start" t-options="{'widget': 'datetime'}"/> - <t t-esc="date_stop" t-options="{'widget': 'datetime'}"/></strong>
+                </div>
+
+                <br/>
+
+                <h3>Payments</h3>
+                <table  class="table table-sm">
+                    <thead><tr>
+                        <th>Name</th>
+                        <th>Total</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr t-foreach='payments' t-as='payment'>
+                        <td><t t-esc="payment['name']" /></td>
+                        <td><t t-esc="payment['total']" t-options="{'widget': 'float', 'precision': currency_precision}"/></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <br/>
+
+                <h3>Taxes</h3>
+                <table  class="table table-sm">
+                    <thead><tr>
+                        <th>Name</th>
+                        <th>Tax Amount</th>
+                        <th>Base Amount</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr t-foreach='taxes' t-as='tax'>
+                        <td><t t-esc="tax['name']" /></td>
+                        <td><t t-esc="tax['tax_amount']" t-options="{'widget': 'float', 'precision': currency_precision}"/></td>
+                        <td><t t-esc="tax['base_amount']" t-options="{'widget': 'float', 'precision': currency_precision}"/></td>
+                    </tr>
+                    </tbody>
+                </table> -->
+
+<!--                 <strong>Total: <t t-esc='total_paid' t-options="{'widget': 'float', 'precision': currency_precision}"/></strong> -->
+
+            </div>
+        </t>
+        </t>
+    </template>
+</data>
+</openerp>
+
