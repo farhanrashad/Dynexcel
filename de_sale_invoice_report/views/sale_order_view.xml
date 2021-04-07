@@ -1,0 +1,41 @@
+<odoo>
+  <data>
+
+    <record id="view_sale_order_form_inhrt" model="ir.ui.view">
+        <field name="name">sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[3]" position="after">
+                <page string="Project/Credit">
+                    <group>
+                        <group>
+                            <field name="location"/>
+                        </group>
+                         <field name="desc_ids">
+                                <tree editable="bottom">
+                                    <field name="name" />
+                                    <field name="amount" />
+                                 </tree>
+                            </field>
+<!--                         <field name="description" placeholder="Description" /> -->
+                    </group>
+                    <group>
+                        <group>
+                        </group>
+                        <group>
+                            <group>
+                            </group>
+                            <group>
+                                 <field name="total_amount"/>
+                            </group>  
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+  </data>
+</odoo>
+
