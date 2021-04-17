@@ -2,7 +2,7 @@
 
 {
     'name': 'HRMS Advance Salary',
-    'version': '14.0.0.2',
+    'version': '11.0.0.1',
     'summary': 'Advance Salary In HR',
     'description': """
         Helps you to manage Advance Salary Request of your company's staff.
@@ -18,7 +18,7 @@
     'data': [
         'security/ir.model.access.csv',
         'data/salary_advance_data.xml',
-        'security/security.xml',
+#         'security/security.xml',
         'views/hr_payroll_structure_views.xml',
         'views/hr_salary_advance_views.xml',
     ],

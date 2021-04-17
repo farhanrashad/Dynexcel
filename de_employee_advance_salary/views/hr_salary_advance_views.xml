@@ -73,7 +73,7 @@
 	                		<group>
 	                        	<field name="employee_id" />
                                 <field name="department_id"/>
-                                <field name="job_title"/>
+<!--                                 <field name="job_title"/> -->
                                 <field name="date"/>
 	                        	
                                 <field name="exceed_condition" groups="hr.group_hr_manager,hr.group_hr_user"/>
@@ -114,8 +114,8 @@
                 <tree string="Salary Advance">
                     <field name="name"/>
                     <field name="employee_id"/>
-                    <field name="job_title" optional="hide"/>
-                    <field name="department_id" optional="hide"/>
+<!--                     <field name="job_title" optional="hide"/> -->
+                    <field name="department_id" />
                     <field name="user_id"/>
                     <field name="date"/>
                     <field name="amount"/>
@@ -203,14 +203,19 @@
 
             <menuitem id="employee_salary_advance_request_menu" action="action_hr_salary_advance_request" parent="employee_salary_advance_menu" name="Request Salary Advance" sequence="1" />
         
-            <menuitem id="employee_salary_advance_department_menu" action="action_hr_salary_advance_department" parent="employee_salary_advance_menu" name="Department Approval" sequence="2" groups="de_employee_advance_salary.group_sal_adv_manager"/>
+            <menuitem id="employee_salary_advance_department_menu" action="action_hr_salary_advance_department" parent="employee_salary_advance_menu" name="Department Approval" sequence="2" />
+<!--         groups="de_employee_advance_salary.group_sal_adv_manager" -->
         
-            <menuitem id="employee_salary_advance_hr_menu" action="action_hr_salary_advance_hr" parent="employee_salary_advance_menu" name="HR Approval" sequence="2" groups="hr.group_hr_manager"/>
         
-            <menuitem id="employee_salary_advance_director_menu" action="action_hr_salary_advance_director" parent="employee_salary_advance_menu" name="Director Approval" sequence="2" groups="de_employee_advance_salary.group_sal_adv_director"/>
         
-            <menuitem id="employee_salary_advance_account_payment_menu" action="action_hr_salary_advance_account_payment" parent="account.menu_finance_payables" name="Salary Advance Payment" sequence="20" groups="account.group_account_user"/>
-
+            <menuitem id="employee_salary_advance_hr_menu" action="action_hr_salary_advance_hr" parent="employee_salary_advance_menu" name="HR Approval" sequence="2" />
+<!--          groups="hr.group_hr_manager" -->
+        
+            <menuitem id="employee_salary_advance_director_menu" action="action_hr_salary_advance_director" parent="employee_salary_advance_menu" name="Director Approval" sequence="2" />
+<!--         groups="de_employee_advance_salary.group_sal_adv_director" -->
+        
+            <menuitem id="employee_salary_advance_account_payment_menu" action="action_hr_salary_advance_account_payment" parent="account.menu_finance_payables" name="Salary Advance Payment" sequence="20" />
+<!-- groups="account.group_account_user" -->
         
             
     </data>

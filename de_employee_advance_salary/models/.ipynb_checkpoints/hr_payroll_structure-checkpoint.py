@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class SalaryStructure(models.Model):
-    _inherit = 'hr.payroll.structure.type'
+    _name = 'hr.payroll.structure.type'
 
     max_percent = fields.Integer(string='Max.Salary Advance Percentage')
     advance_date = fields.Integer(string='Salary Advance-After days')

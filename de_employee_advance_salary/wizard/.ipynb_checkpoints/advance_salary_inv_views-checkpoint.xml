@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    
         <record id="view_salary_advance_payment_inv" model="ir.ui.view">
             <field name="name">Bill Advances</field>
             <field name="model">advance.salary.payment.inv</field>

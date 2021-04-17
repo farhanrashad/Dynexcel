@@ -15,7 +15,7 @@ class HRSalaryAdvance(models.Model):
 
     employee_id = fields.Many2one('hr.employee', string='Employee', required=True, readonly=True, states={'draft': [('readonly', False)]},)
     department_id = fields.Many2one('hr.department', string='Department', related='employee_id.department_id')
-    job_title = fields.Char(related='employee_id.job_title')
+#     job_title = fields.Char(related='employee_id.job_title')
     employee_contract_id = fields.Many2one('hr.contract', string='Contract', required=True, readonly=True, states={'draft': [('readonly', False)]}, domain="[('employee_id','=',employee_id)]")
     date = fields.Date(string='Request Date', required=True, readonly=True, states={'draft': [('readonly', False)]}, default=lambda self: fields.Date.today())
     reason = fields.Text(string='Reason')
@@ -218,4 +218,5 @@ class HRSalaryAdvance(models.Model):
         })
         return payment
     
-        
+    
+#     

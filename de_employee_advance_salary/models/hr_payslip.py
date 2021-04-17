@@ -5,6 +5,7 @@ from odoo import models,api
 
 class SalaryRuleInput(models.Model):
     _inherit = 'hr.payslip'
+    
     def compute_sheet(self):
         amount = 0 
         adv_salary = self.env['hr.salary.advance'].search([('employee_id', '=', self.employee_id.id),
