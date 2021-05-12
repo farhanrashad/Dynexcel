@@ -62,17 +62,21 @@
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approval1,approval2,approval3,paid"/>
                     </header>
                 	<sheet>
-                        <div class="oe_button_box" name="button_box"> 
-                          <button type="object" name="action_get_bill" string="Advances Bills"  class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible':[ ('bill_count', '=', 0)]}">
-                              
-                            </button>    
-                        </div>    
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" icon="fa-book" string="Vendor Bill" name="action_view_invoice" type="object" attrs="{'invisible':[ ('bill_count', '=', 0)]}">
+                                <field name="bill_count" widget="statinfo" string="Vendor Bill"/>
+                            </button>
+                            <button class="oe_stat_button" icon="fa-book" string="Payment"
+                                    name="action_view_payment" type="object" attrs="{'invisible':[ ('payment_count', '=', 0)]}">
+                            <field name="payment_count" widget="statinfo" string="Payment"/>
+                            </button>
+                        </div> 
                         <div class="oe_title oe_left">
                             <h2>
-                            <field name="name" class="oe_inline" readonly="1"/>
-                                
+                                <field name="name" class="oe_inline" readonly="1"/>
                             </h2>
                             <field name="bill_count" invisible="1"/>
+                            <field name="payment_count" invisible="1"/>
                         </div>
                 		<group>
 	                		<group>
@@ -100,12 +104,15 @@
                                 <group>
                                     <group>
                                         <field name="deductable" />
+                                        <field name="journal_type" invisible="1" />
                                         <field name="partner_id" attrs="{'required':[('state','=','approval3')]}" />
                                         <field name="journal_id" attrs="{'required':[('state','=','approval3')]}" />
-                                        <field name="payment_id"/>
-                                        <field name="payment_method_id"  attrs="{'required':[('state','=','approval3')]}" />
-                                        <field name="account_id"  attrs="{'required':[('state','=','approval3')]}" />
-                                        <field name="payment_amount" readonly="1"/>
+                                        <field name="journal_type"/>
+                                        <field name="payment_id" attrs="{'invisible':[('journal_type','=','purchase')]}" />
+                                        <field name="payment_method_id"  attrs="{'invisible':[('journal_type','=','purchase')],'required':[('journal_type','in',['cash','bank'])]}" />
+                                        <field name="account_id"  attrs="{'invisible':[('journal_type','!=','purchase')],'required':[('journal_type','=','purchase')]}" />
+
+                                        <field name="paid_amount" readonly="1"/>
                                     </group>
                                 </group>
                             </page>

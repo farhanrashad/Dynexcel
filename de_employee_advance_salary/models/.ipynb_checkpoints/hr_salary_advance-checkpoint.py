@@ -6,6 +6,21 @@ from odoo.exceptions import except_orm
 from odoo import exceptions
 from odoo.exceptions import UserError, ValidationError
 
+READONLY_STATES = {
+    'confirm': [('readonly', True)],
+    'approval1': [('readonly', True)],
+    'approval2': [('readonly', True)],
+    'approval3': [('readonly', True)],
+    'paid': [('readonly', True)],
+    'done': [('readonly', True)],
+    'cancel': [('readonly', True)],
+}
+
+PAYMENT_READONLY_STATES = {
+    'paid': [('readonly', True)],
+    'done': [('readonly', True)],
+    'cancel': [('readonly', True)],
+}
 
 
 class HRSalaryAdvance(models.Model):
@@ -15,19 +30,19 @@ class HRSalaryAdvance(models.Model):
 
     name = fields.Char(string='Reference', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
 
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, readonly=True, states={'draft': [('readonly', False)]},)
-    department_id = fields.Many2one('hr.department', string='Department', related='employee_id.department_id')
-    job_title = fields.Many2one(related='employee_id.job_id')
-    employee_contract_id = fields.Many2one('hr.contract', string='Contract', required=True, readonly=True, states={'draft': [('readonly', False)]}, domain="[('employee_id','=',employee_id)]")
-    date = fields.Date(string='Request Date', required=True, readonly=True, states={'draft': [('readonly', False)]}, default=lambda self: fields.Date.today())
+    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, states=READONLY_STATES,)
+    department_id = fields.Many2one('hr.department', string='Department', related='employee_id.department_id', readonly=True)
+    job_title = fields.Many2one(related='employee_id.job_id',readonly=True)
+    employee_contract_id = fields.Many2one('hr.contract', string='Contract', required=True, states=READONLY_STATES, domain="[('employee_id','=',employee_id)]")
+    date = fields.Date(string='Request Date', required=True, states=READONLY_STATES, default=lambda self: fields.Date.today())
     reason = fields.Text(string='Reason')
-    currency_id = fields.Many2one('res.currency', string='Currency', required=True,
+    currency_id = fields.Many2one('res.currency', string='Currency', required=True, states=READONLY_STATES,
                                   default=lambda self: self.env.user.company_id.currency_id)
-    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states={'draft': [('readonly', False)]}, default=lambda self: self.env.user.company_id)
-    user_id = fields.Many2one('res.users', string='Requester', readonly=True, states={'draft': [('readonly', False)]}, tracking=True, default=lambda self: self.env.user)
+    company_id = fields.Many2one('res.company', string='Company', required=True, states=READONLY_STATES, default=lambda self: self.env.user.company_id)
+    user_id = fields.Many2one('res.users', string='Requester', states=READONLY_STATES, tracking=True, default=lambda self: self.env.user)
 
-    amount = fields.Monetary(string='Request Amount', required=True, readonly=True, states={'draft': [('readonly', False)]},)
-    exceed_condition = fields.Boolean(string='Exceed than maximum', help="The Advance is greater than the maximum percentage in salary structure")
+    amount = fields.Monetary(string='Request Amount', required=True, states=READONLY_STATES,)
+    exceed_condition = fields.Boolean(string='Exceed than maximum', help="The Advance is greater than the maximum percentage in salary structure", states=READONLY_STATES,)
     state = fields.Selection([('draft', 'Draft'),
                               ('confirm', 'Confirmed'),
                               ('approval1', 'Approved by Manager'),
@@ -37,26 +52,44 @@ class HRSalaryAdvance(models.Model):
                               ('cancel', 'Reject'),
                               ('done', 'Done'),], string='Status', default='draft', track_visibility='onchange')
     
-    deductable = fields.Boolean(string='Deductable', default=True)
-    partner_id = fields.Many2one('res.partner', 'Employee Partner', readonly=False, states={'paid': [('readonly', True)]},)
-    journal_id = fields.Many2one('account.journal', string='Payment Method', domain="[('type','in',['cash','bank'])]")
+    deductable = fields.Boolean(string='Deductable', default=True, states=PAYMENT_READONLY_STATES,)
+    partner_id = fields.Many2one('res.partner', string='Partner', states=PAYMENT_READONLY_STATES)
+    journal_id = fields.Many2one('account.journal', string='Journal', domain="[('type','in',['cash','bank','purchase'])]", states=PAYMENT_READONLY_STATES)
+    journal_type = fields.Selection(related='journal_id.type', readonly=True)
+
     payment_id = fields.Many2one('account.payment', string='Payment', readonly=True, compute='_get_payment')
-    payment_amount = fields.Monetary(related='payment_id.amount')
-    account_id = fields.Many2one('account.account',string="Account")
-    payment_method_id = fields.Many2one('account.payment.method', string='Payment Method Type', oldname="payment_method",
-        help="Manual: Get paid by cash, check or any other method outside of Odoo.\n"\
-        "Electronic: Get paid automatically through a payment acquirer by requesting a transaction on a card saved by the customer when buying or subscribing online (payment token).\n"\
-        "Check: Pay bill by check and print it from Odoo.\n"\
-        "Batch Deposit: Encase several customer checks at once by generating a batch deposit to submit to your bank. When encoding the bank statement in Odoo, you are suggested to reconcile the transaction with the batch deposit.To enable batch deposit,module account_batch_deposit must be installed.\n"\
-        "SEPA Credit Transfer: Pay bill from a SEPA Credit Transfer file you submit to your bank. To enable sepa credit transfer, module account_sepa must be installed ")
+    paid_amount = fields.Monetary(string='Paid Amount', readonly=True, compute="_compute_paid_amount")
+    account_id = fields.Many2one('account.account',string="Account", states=PAYMENT_READONLY_STATES)
+    payment_method_id = fields.Many2one('account.payment.method', string='Payment Method Type', oldname="payment_method", states=PAYMENT_READONLY_STATES)
     
+    
+        
+    bill_count = fields.Integer(string='Vendor Bill', compute='get_bill_count')
+    payment_count = fields.Integer(string='Payment', compute='get_payment_count')
+    
+    #@api.depends('order_line.price_total')
+    def _compute_paid_amount(self):
+        amount = 0
+        invoices = self.env['account.invoice'].search([('hr_salary_advance_id', '=', self.id)])
+        payments = self.env['account.payment'].search([('hr_salary_advance_id', '=', self.id)])
+        for adv in self:
+            if adv.journal_id.type == 'purchase':
+                for invoice in invoices:
+                    amount += invoice.amount_total
+            else:
+                for payment in payments:
+                    amount += payment.amount
+            adv.update({
+                'paid_amount': amount,
+            })
+        
     def get_bill_count(self):
-        count = self.env['account.invoice'].search_count([('origin', '=', self.name)])
+        count = self.env['account.invoice'].search_count([('hr_salary_advance_id', '=', self.id)])
         self.bill_count = count
         
-    bill_count = fields.Integer(string='Advances Bill', compute='get_bill_count')
-    
-    
+    def get_payment_count(self):
+        count = self.env['account.payment'].search_count([('hr_salary_advance_id', '=', self.id)])
+        self.payment_count = count
     
     @api.depends('state')
     def _get_payment(self):
@@ -207,15 +240,26 @@ class HRSalaryAdvance(models.Model):
         self.state = 'approval3'
         return True
     
-    def action_get_bill(self):
+    def action_view_invoice(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
             'binding_type': 'action',
-            'name': 'Advances Bill',
-            'domain': [('origin','=', self.name)],
+            'name': 'Vendor Bill',
+            'domain': [('hr_salary_advance_id','=', self.id)],
             'target': 'current',
             'res_model': 'account.invoice',
+            'view_mode': 'tree,form',
+        }
+    def action_view_payment(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'binding_type': 'action',
+            'name': 'Payment',
+            'domain': [('hr_salary_advance_id','=', self.id)],
+            'target': 'current',
+            'res_model': 'account.payment',
             'view_mode': 'tree,form',
         }
 
@@ -227,26 +271,26 @@ class HRSalaryAdvance(models.Model):
 
     def action_payment(self):
         invoice = False
-        #if self.journal_id.type == 'purchase':
-        invoice = self.env['account.invoice']
-        lines_data = []
-        lines_data.append([0,0,{
-            'name': self.name,
-            'price_unit': self.amount,
-            'account_id': self.account_id.id,
-            'quantity': 1,
-        }])
-        invoice.create({
-            'partner_id': self.partner_id.id,
-            'type': 'in_invoice',
-            'reference': self.name,
-            'origin': self.name,
-            'date_invoice':self.date,
-            'journal_id':self.journal_id.id,
-            'invoice_line_ids':lines_data,
-        })
-        self.state = 'paid'
-        """
+        if self.journal_id.type == 'purchase':
+            invoice = self.env['account.invoice']
+            lines_data = []
+            lines_data.append([0,0,{
+                'name': self.name,
+                'price_unit': self.amount,
+                'account_id': self.account_id.id,
+                'quantity': 1,
+            }])
+            invoice.create({
+                'partner_id': self.partner_id.id,
+                'type': 'in_invoice',
+                'reference': self.name,
+                'origin': self.name,
+                'date_invoice':self.date,
+                'journal_id':self.journal_id.id,
+                'hr_salary_advance_id':self.id,
+                'invoice_line_ids':lines_data,
+            })
+        
         elif self.journal_id.type in ('bank','cash'):
             payment = self.env['account.payment']
             payment.create({
@@ -260,13 +304,11 @@ class HRSalaryAdvance(models.Model):
                 'journal_id': self.journal_id.id,
                 'date': fields.Date.today(),
                 'ref': self.name,
-                'hr_salary_advance_id': self.id
+                'hr_salary_advance_id':self.id,
             })
         self.update({
-            'payment_id': payment.id,
             'state': 'paid'
         })
-        """
         return invoice
     
         

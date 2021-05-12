@@ -8,3 +8,8 @@ class AccountPayment(models.Model):
 
     hr_salary_advance_id = fields.Many2one('hr.salary.advance', string='Salary Advance')
 
+class AccountInvoice(models.Model):
+    _inherit = 'account.invoice'
+
+    hr_salary_advance_id = fields.Many2one('hr.salary.advance', string='Salary Advance')
+
