@@ -113,6 +113,8 @@
                                         <field name="account_id"  attrs="{'invisible':[('journal_type','!=','purchase')],'required':[('journal_type','=','purchase')]}" />
 
                                         <field name="paid_amount" readonly="1"/>
+                                        <field name="deduction_amount" readonly="1"/>
+                                        <field name="residual_amount" readonly="1"/>
                                     </group>
                                 </group>
                             </page>
@@ -131,6 +133,9 @@
                     <field name="employee_id"/>
                     <field name="date"/>
                     <field name="amount"/>
+                    <field name="paid_amount" readonly="1"/>
+                    <field name="deduction_amount" readonly="1"/>
+                    <field name="residual_amount" readonly="1"/>
                     <field name="state"/>
                 </tree>
             </field>

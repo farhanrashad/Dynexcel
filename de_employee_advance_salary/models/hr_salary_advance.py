@@ -58,7 +58,10 @@ class HRSalaryAdvance(models.Model):
     journal_type = fields.Selection(related='journal_id.type', readonly=True)
 
     payment_id = fields.Many2one('account.payment', string='Payment', readonly=True, compute='_get_payment')
-    paid_amount = fields.Monetary(string='Paid Amount', readonly=True, compute="_compute_paid_amount")
+    paid_amount = fields.Monetary(string='Paid Amount', readonly=True, compute="_compute_all_amount")
+    deduction_amount = fields.Monetary(string='Deduction', readonly=True, compute="_compute_all_amount")
+    residual_amount = fields.Monetary(string='Residual', readonly=True, compute="_compute_all_amount")
+
     account_id = fields.Many2one('account.account',string="Account", states=PAYMENT_READONLY_STATES)
     payment_method_id = fields.Many2one('account.payment.method', string='Payment Method Type', oldname="payment_method", states=PAYMENT_READONLY_STATES)
     
@@ -68,11 +71,23 @@ class HRSalaryAdvance(models.Model):
     payment_count = fields.Integer(string='Payment', compute='get_payment_count')
     
     #@api.depends('order_line.price_total')
-    def _compute_paid_amount(self):
-        amount = 0
-        invoices = self.env['account.invoice'].search([('hr_salary_advance_id', '=', self.id)])
-        payments = self.env['account.payment'].search([('hr_salary_advance_id', '=', self.id)])
+    @api.multi
+    def _compute_all_amount(self):
+        amount = deduction = 0
+        invoices = self.env['account.invoice']
+        payments = self.env['account.payment']
+        payslips = self.env['hr.payslip']
+        input_rules = self.env['hr.payslip.input']
+
         for adv in self:
+            amount = deduction = 0
+            invoices = self.env['account.invoice'].search([('hr_salary_advance_id', '=', adv.id)])
+            payments = self.env['account.payment'].search([('hr_salary_advance_id', '=', adv.id)])
+            payslips = self.env['hr.payslip'].search([('employee_id','=',adv.employee_id.id),('date_from','<=',adv.date),('date_to','>=', adv.date)])
+            for payslip in payslips:
+                input_rules = self.env['hr.payslip.input'].search([('payslip_id', '=', payslip.id), ('code', '=', 'SAR')])
+                for input in input_rules:
+                    deduction += input.amount
             if adv.journal_id.type == 'purchase':
                 for invoice in invoices:
                     amount += invoice.amount_total
@@ -81,6 +96,8 @@ class HRSalaryAdvance(models.Model):
                     amount += payment.amount
             adv.update({
                 'paid_amount': amount,
+                'deduction_amount': deduction,
+                'residual_amount': amount - deduction,
             })
         
     def get_bill_count(self):
