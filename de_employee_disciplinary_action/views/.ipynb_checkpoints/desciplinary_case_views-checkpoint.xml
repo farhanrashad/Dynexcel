@@ -19,6 +19,9 @@
                     <field name="employee_id"/>
                     <field name="date"/>
                     <field name="case_type"/>
+                    <field name="penalty_amount" />
+                    <field name="deduction_amount" />
+                    <field name="residual_amount" />
                     <field name="user_id"/>
                     <field name="state"/>
 
@@ -125,10 +128,15 @@
                                 <field name="case_type" options="{'no_create': True, 'no_create_edit':True}" attrs="{'readonly': ['|',('state','=','wait-resp'),('state','=','close')]}"/>
                                  <field name="apply_penalty"/>
                                 <field name="penalty_amount" attrs="{'invisible':[('apply_penalty','!=',True)],'required':[('apply_penalty','=',True)]}"/>
+                                <field name="deduction_amount" />
+                                <field name="residual_amount" />
+
                             </group>
                             <group>
                                 <field name="date" attrs="{'readonly': ['|',('state','=','wait-resp'),('state','=','close')]}"/>
                                 <field name="user_id" options="{'no_create': True, 'no_create_edit':True}" attrs="{'readonly': ['|',('state','=','wait-resp'),('state','=','close')]}"/>
+                                <field name="currency_id" groups="base.group_multi_currency"/>
+                                <field name="company_id"  />
                             </group>
                         </group>
                         <notebook>
