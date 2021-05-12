@@ -245,6 +245,7 @@ class HRSalaryAdvance(models.Model):
             'journal_id':self.journal_id.id,
             'invoice_line_ids':lines_data,
         })
+        self.state = 'paid'
         """
         elif self.journal_id.type in ('bank','cash'):
             payment = self.env['account.payment']
