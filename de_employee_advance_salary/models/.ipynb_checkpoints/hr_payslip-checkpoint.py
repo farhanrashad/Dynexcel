@@ -30,7 +30,7 @@ class SalaryRuleInput(models.Model):
                               'payslip_id': self.id,
                               })
                         else:
-                            if not input_exists:
+                            if input_exists.amount == 0:
                                 input_exists.write({
                                     'amount': amount,
                                 })
