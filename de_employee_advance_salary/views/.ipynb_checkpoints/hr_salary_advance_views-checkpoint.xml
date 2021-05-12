@@ -33,6 +33,8 @@
                     <filter string="State" name="group_by_state" context="{'group_by': 'state'}"/>
                 </group>
                     
+
+
                </search>
             </field>
         </record>
@@ -46,38 +48,37 @@
                     <header>
                         <button name="action_confirm" string="Confirm" type="object" states="draft" class="oe_highlight"/>
                         
-                        <button name="action_approval1" string="Approved by Department Manager" 
-                                type="object" states="confirm" class="oe_highlight" />
-<!--                         groups="de_employee_advance_salary.group_sal_adv_manager" -->
+                        <button name="action_approval1" string="Approved by Department Manager" type="object" states="confirm" class="oe_highlight" groups="de_employee_advance_salary.group_sal_adv_manager"/>
                         
-                        <button name="action_approval2" string="Approved by HR Manager" type="object" states="approval1" class="oe_highlight" />
-<!--                         groups="hr.group_hr_manager" -->
+                        <button name="action_approval2" string="Approved by HR Manager" type="object" states="approval1" class="oe_highlight" groups="hr.group_hr_manager"/>
                         
-                        <button name="action_approval3" string="Approved by Director" type="object" states="approval2" class="oe_highlight" />
-<!--                         groups="de_employee_advance_salary.group_sal_adv_director" -->
+                        <button name="action_approval3" string="Approved by Director" type="object" states="approval2" class="oe_highlight" groups="de_employee_advance_salary.group_sal_adv_director"/>
                         
-                        <button name="action_payment" string="Pay" type="object" states="approval3" class="oe_highlight" />
-<!--                         groups="account.group_account_manager" -->
+                        <button name="action_payment" string="Pay" type="object" states="approval3" class="oe_highlight" groups="account.group_account_manager"/>
+<!--                         <button name="action_payment" string="Pay" type="object" class="oe_highlight"/> -->
                         
-                        <button name="action_done" string="Done" type="object" states="paid" class="oe_highlight" />
-<!--                         groups="hr.group_hr_manager" -->
+                        <button name="action_done" string="Done" type="object" states="paid" class="oe_highlight" groups="hr.group_hr_manager"/>
 
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approval1,approval2,approval3,paid"/>
                     </header>
                 	<sheet>
                         <div class="oe_button_box" name="button_box"> 
-               
+                          <button type="object" name="action_get_bill" string="Advances Bills"  class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible':[ ('bill_count', '=', 0)]}">
+                              
+                            </button>    
                         </div>    
                         <div class="oe_title oe_left">
                             <h2>
                             <field name="name" class="oe_inline" readonly="1"/>
+                                
                             </h2>
+                            <field name="bill_count" invisible="1"/>
                         </div>
                 		<group>
 	                		<group>
 	                        	<field name="employee_id" />
                                 <field name="department_id"/>
-<!--                                 <field name="job_title"/> -->
+                                <field name="job_title"/>
                                 <field name="date"/>
 	                        	
                                 <field name="exceed_condition" groups="hr.group_hr_manager,hr.group_hr_user"/>
@@ -98,10 +99,13 @@
                             <page string="Accounting Information" name="accounting_info">
                                 <group>
                                     <group>
+                                        <field name="deductable" />
                                         <field name="partner_id" attrs="{'required':[('state','=','approval3')]}" />
                                         <field name="journal_id" attrs="{'required':[('state','=','approval3')]}" />
                                         <field name="payment_id"/>
-                                        <field name="payment_amount" />
+                                        <field name="payment_method_id"  attrs="{'required':[('state','=','approval3')]}" />
+                                        <field name="account_id"  attrs="{'required':[('state','=','approval3')]}" />
+                                        <field name="payment_amount" readonly="1"/>
                                     </group>
                                 </group>
                             </page>
@@ -110,17 +114,14 @@
                 </form>
             </field>
         </record>
-
-        <record model="ir.ui.view" id="hr_salary_advance_tree_view">
-            <field name="name">hr.salary.advance.tree.view</field>
+        
+        
+         <record model="ir.ui.view" id="view_salary_advance_tree">
+            <field name="name">hr.salary.advance.tree</field>
             <field name="model">hr.salary.advance</field>
             <field name="arch" type="xml">
                 <tree string="Salary Advance">
-                    <field name="name"/>
                     <field name="employee_id"/>
-<!--                     <field name="job_title" optional="hide"/> -->
-                    <field name="department_id" />
-                    <field name="user_id"/>
                     <field name="date"/>
                     <field name="amount"/>
                     <field name="state"/>
@@ -128,6 +129,23 @@
             </field>
         </record>
 
+<!--         <record model="ir.ui.view" id="hr_salary_advance_tree_view">
+            <field name="name">hr.salary.advance.tree.view</field>
+            <field name="model">hr.salary.advance</field>
+            <field name="arch" type="xml">
+                <tree string="Salary Advance">
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="job_title" optional="hide"/>
+                    <field name="department_id" optional="hide"/>
+                    <field name="user_id"/>
+                    <field name="date"/>
+                    <field name="amount"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+ -->
         
         <record id="action_hr_salary_advance_request" model="ir.actions.act_window">
             <field name="name">Request Salary Advance</field>
@@ -207,19 +225,14 @@
 
             <menuitem id="employee_salary_advance_request_menu" action="action_hr_salary_advance_request" parent="employee_salary_advance_menu" name="Request Salary Advance" sequence="1" />
         
-            <menuitem id="employee_salary_advance_department_menu" action="action_hr_salary_advance_department" parent="employee_salary_advance_menu" name="Department Approval" sequence="2" />
-<!--         groups="de_employee_advance_salary.group_sal_adv_manager" -->
+            <menuitem id="employee_salary_advance_department_menu" action="action_hr_salary_advance_department" parent="employee_salary_advance_menu" name="Department Approval" sequence="2" groups="de_employee_advance_salary.group_sal_adv_manager"/>
         
+            <menuitem id="employee_salary_advance_hr_menu" action="action_hr_salary_advance_hr" parent="employee_salary_advance_menu" name="HR Approval" sequence="2" groups="hr.group_hr_manager"/>
         
+            <menuitem id="employee_salary_advance_director_menu" action="action_hr_salary_advance_director" parent="employee_salary_advance_menu" name="Director Approval" sequence="2" groups="de_employee_advance_salary.group_sal_adv_director"/>
         
-            <menuitem id="employee_salary_advance_hr_menu" action="action_hr_salary_advance_hr" parent="employee_salary_advance_menu" name="HR Approval" sequence="2" groups="hr.group_hr_manager" />
-         
-        
-            <menuitem id="employee_salary_advance_director_menu" action="action_hr_salary_advance_director" parent="employee_salary_advance_menu" name="Director Approval" sequence="2" />
-<!--         groups="de_employee_advance_salary.group_sal_adv_director" -->
-        
-            <menuitem id="employee_salary_advance_account_payment_menu" action="action_hr_salary_advance_account_payment" parent="account.menu_finance_payables" name="Salary Advance Payment" sequence="20" />
-<!-- groups="account.group_account_user" -->
+            <menuitem id="employee_salary_advance_account_payment_menu" action="action_hr_salary_advance_account_payment" parent="account.menu_finance_payables" name="Salary Advance Payment" sequence="20" groups="account.group_account_user"/>
+
         
             
     </data>

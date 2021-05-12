@@ -1,3 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_salary_advance,access.hr.salary.advance,model_hr_salary_advance,,1,1,1,1
-access_hr_payroll_structure_type,access.hr.payroll.structure.type,model_hr_payroll_structure_type,,1,1,1,1
+access_hr_salary_advance_user,access.hr.salary.advance.user,model_hr_salary_advance,hr.group_hr_user,1,1,1,1

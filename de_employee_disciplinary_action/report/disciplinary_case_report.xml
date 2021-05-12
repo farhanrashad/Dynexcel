@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <report
+            id="employee_disciplinary_case"
+            string="Disciplinary Case"
+            model="hr.employee.disciplinary.action"
+            report_type="qweb-pdf"
+            file="de_employee_disciplinary_action.report_hr_employee_disciplinary_case_template"
+            name="de_employee_disciplinary_action.report_hr_employee_disciplinary_case_template" />
+</odoo>

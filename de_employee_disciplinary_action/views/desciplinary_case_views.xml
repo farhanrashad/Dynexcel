@@ -1,0 +1,183 @@
+<odoo>
+  <data>      
+    <record model="ir.ui.view" id="disciplinary_case_type_tree_view">
+            <field name="name">hr.employee.disciplinary.action.type.tree</field>
+            <field name="model">hr.employee.disciplinary.action.type</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+      
+       <record model="ir.ui.view" id="disciplinary_case_tree_view">
+            <field name="name">hr.employee.disciplinary.action.tree</field>
+            <field name="model">hr.employee.disciplinary.action</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="date"/>
+                    <field name="case_type"/>
+                    <field name="user_id"/>
+                    <field name="state"/>
+
+                </tree>
+            </field>
+        </record>
+      
+      <record model="ir.ui.view" id="con_job_order_form">
+            <field name="name">hr.employee.disciplinary.action.type.form</field>
+            <field name="model">hr.employee.disciplinary.action.type</field>
+            <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                       <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+          </field>
+      </record> 
+      
+      <record id="view_disciplinary_case_kanban" model="ir.ui.view">
+            <field name="name">hr.employee.disciplinary.action.kanban</field>
+            <field name="model">hr.employee.disciplinary.action</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="employee_id"/>
+                    <field name="case_type"/>
+                    <field name="date"/>
+                    <field name="user_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click">
+                                <div class="row mb4">
+                                    <div class="col-6 o_kanban_record_headings">
+                                        <strong><span><field name="employee_id"/></span></strong>
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <strong><i class="fa fa-clock-o" aria-label="Date" role="img" title="Date"/> <t t-esc="record.date.value"/></strong>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <span><field name="case_type"/></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <span><field name="user_id"/></span>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="float-right">
+                                            <field name="state" widget="label_selection" options="{'classes': {'draft': 'default', 'close': 'success'}}"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+      
+      <record id="disciplinary_case_search" model="ir.ui.view">
+            <field name="name">hr.employee.disciplinary.action.search</field>
+            <field name="model">hr.employee.disciplinary.action</field>
+            <field name="arch" type="xml">
+                <search string="Search Disciplinary Case">
+                    <field name="name" filter_domain="['|', '|', ('date', 'ilike', self), ('name', 'ilike', self), ('employee_id', 'ilike', self)]" string="Reference"/>
+                    <field name="date" string='Date'/>
+                    <field name="employee_id" string='Employee'/>
+                    <group expand="0" string="Group By">
+                        <filter name="employee_id" string="Employee" domain="[]" context="{'group_by' : 'employee_id'}" />
+                        <filter string="Status" name="status" domain="[]" context="{'group_by' : 'state'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+      
+      
+      <record model="ir.ui.view" id="disciplinary_case_form">
+            <field name="name">hr.employee.disciplinary.action.form</field>
+            <field name="model">hr.employee.disciplinary.action</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_waiting_case" states="draft" string="Confirm" type="object"/>
+                        <button name="action_case_send" states="wait-resp" string="Send by Email" type="object"/>
+                        <button name="action_close_case" states="wait-resp" string="Close Case" type="object"/>
+                        <button name="action_apply_penalty" states="wait-resp" string="Apply Penalty" type="object"/>
+
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,wait-resp,close"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Name..."/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="employee_id" options="{'no_create': True, 'no_create_edit':True}" attrs="{'readonly': ['|',('state','=','wait-resp'),('state','=','close')]}"/>
+                                <field name="case_type" options="{'no_create': True, 'no_create_edit':True}" attrs="{'readonly': ['|',('state','=','wait-resp'),('state','=','close')]}"/>
+                                 <field name="apply_penalty"/>
+                                <field name="penalty_amount" attrs="{'invisible':[('apply_penalty','!=',True)],'required':[('apply_penalty','=',True)]}"/>
+                            </group>
+                            <group>
+                                <field name="date" attrs="{'readonly': ['|',('state','=','wait-resp'),('state','=','close')]}"/>
+                                <field name="user_id" options="{'no_create': True, 'no_create_edit':True}" attrs="{'readonly': ['|',('state','=','wait-resp'),('state','=','close')]}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Reason">
+                                <group>
+                                    <field name="note" attrs="{'readonly': ['|',('state','=','wait-resp'),('state','=','close')]}"/>
+                                </group>
+                            </page>
+                            <page string="Attachments">
+                                <field name="attachment_ids" widget="many2many_binary" class="oe_inline" attrs="{'readonly': ['|',('state','=','wait-resp'),('state','=','close')]}"/>
+                            </page>
+                            
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+      
+       <record id="disciplinary_case_type_menu_action" model="ir.actions.act_window">
+        <field name="name">Disciplinary Case type</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.employee.disciplinary.action.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a New Disciplinary case type
+            </p>
+        </field>
+    </record>
+      
+      <record id="disciplinary_case_menu_action" model="ir.actions.act_window">
+        <field name="name">Disciplinary Case</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.employee.disciplinary.action</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a New Disciplinary Action
+            </p>
+        </field>
+    </record>
+      
+    <menuitem name="Disciplinary Case" id="desciplinary_main_menu" parent="hr.menu_hr_root" sequence="4"/>
+    <menuitem name="Case types" id="desciplinary_sub_menu" parent="desciplinary_main_menu" action="disciplinary_case_type_menu_action" sequence="2"/>
+    <menuitem name="Cases " id="desciplinary_case_sub_menu" parent="desciplinary_main_menu" action="disciplinary_case_menu_action" sequence="1"/>
+  </data>
+</odoo>
