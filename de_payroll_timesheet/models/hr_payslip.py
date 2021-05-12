@@ -19,12 +19,12 @@ class HrPayslip(models.Model):
         res = super(HrPayslip, self).onchange_employee()
         lst = []
         if self.date_from and self.date_to and self.contract_id:
-            self._cr.execute("select sum(unit_amount) from account_analytic_line where date::date>='%s' and date::date<='%s' and employee_id=%d" % (self.date_from, self.date_to, self.employee_id.id))
+            self._cr.execute("select count(id), sum(unit_amount) from account_analytic_line where date::date>='%s' and date::date<='%s' and employee_id=%d" % (self.date_from, self.date_to, self.employee_id.id))
             result = self._cr.fetchone()
             if result and result[0]:
                 lst.append({'name': '%s Timesheets' % (self.employee_id.name),
                             'number_of_days': result[0],
-                            'number_of_hours': result[0],
+                            'number_of_hours': result[1],
                             'code' : 'WORK200',
                             'contract_id': self.contract_id.id})
             # leave
