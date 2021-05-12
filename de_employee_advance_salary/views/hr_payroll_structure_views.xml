@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- advance salary rule -->
+       
+        <!-- salary structure -->
+        <record model="ir.ui.view" id="model_hr_contract_form">
+            <field name="name">hr.contract.form</field>
+            <field name="model">hr.contract</field>
+            <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='salary_and_advantages']" position="after">
+                    <group>
+                    <group string="Advance Salary">
+                    <field name="max_percent" string="Max.Salary Advance Percentage"/>
+                    <field name="advance_date" string="Salary Advance-After days"/>
+                    </group>
+                    <group>
+                    </group> 
+                    </group>    
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

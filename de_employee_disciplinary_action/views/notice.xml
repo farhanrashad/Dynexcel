@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="hr_employee_notice_form_view" model="ir.ui.view">
+            <field name="name">hr.employee.notice.form</field>
+            <field name="model">hr.employee.notice</field>
+            <field name="arch" type="xml">
+                <form string="Notice">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,done"/>
+
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="employee_id"/>
+                                <field name="user_id"/>
+                                <field name="job_title"/>
+                            </group>
+                            <group>
+                                <field name="parent_id"/>
+                                <field name="department_id"/>
+                                <field name="identity"/>
+                            </group>
+                            <group colspan="4" col="4">
+                                <field name="office_type"/>
+                                <field name="warning_type"/>
+                                <field name="date"/>
+                                <field name="created_id"/>
+
+                            </group>
+                            <group colspan="4" col="4">
+                                <field name="decision"/>
+                                <field name="improvement"/>
+                                <field name="consequence"/>
+
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="hr_employee_offence_tree_view" model="ir.ui.view">
+            <field name="name">hr.employee.notice.tree</field>
+            <field name="model">hr.employee.notice</field>
+            <field name="arch" type="xml">
+                <tree string="Notice">
+                    <field name="employee_id"/>
+                    <field name="user_id"/>
+                    <field name="job_title"/>
+                    <field name="parent_id"/>
+                    <field name="department_id"/>
+                    <field name="identity"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="de_employee_notice_action" model="ir.actions.act_window">
+            <field name="name">Notice</field>
+            <field name="res_model">hr.employee.notice</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem name="Notice" id="de_employee_disciplinary_notice_menu_" parent="de_employee_disciplinary_configuration_id"
+                  action="de_employee_notice_action" sequence="1"/>
+
+    </data>
+</odoo>
