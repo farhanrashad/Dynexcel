@@ -115,15 +115,15 @@ class HRSalaryAdvance(models.Model):
         if not payment_id:
             self.payment_id = False
             
-    @api.constrains('amount')
-    def _check_amount(self):
-        if self.amount:
-            contract_id = self.env['hr.contract'].search([('employee_id','=', self.employee_id.id),('state','=','open')], limit=1)       
-            self.employee_contract_id = contract_id.id
-            adv = self.amount
-            amt = (self.employee_contract_id.max_percent * self.employee_contract_id.wage) / 100
-            if adv > amt and not self.exceed_condition:
-                raise UserError(('Error!', 'Advance amount is greater than allotted. You are only allow to enter Amount '+str(amt)))
+    #@api.constrains('amount')
+    #def _check_amount(self):
+        #if self.amount:
+            #contract_id = self.env['hr.contract'].search([('employee_id','=', self.employee_id.id),('state','=','open')], limit=1)       
+            #self.employee_contract_id = contract_id.id
+            #adv = self.amount
+            #amt = (self.employee_contract_id.max_percent * self.employee_contract_id.wage) / 100
+            #if adv > amt and not self.exceed_condition:
+                #raise UserError(('Error!', 'Advance amount is greater than allotted. You are only allow to enter Amount '+str(amt)))
 
     def unlink(self):
         if any(self.filtered(lambda loan: loan.state not in ('draft', 'cancel'))):
